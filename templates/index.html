@@ -3,60 +3,402 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BeClip — Free Media Downloader</title>
+  <title>ReClip — Free Media Downloader</title>
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root{ --bg:#050816; --bg2:#0b1120; --card:rgba(255,255,255,.06); --border:rgba(255,255,255,.08); --text:#f5f7ff; --muted:#94a3b8; --cyan:#00e5ff; --purple:#7b61ff; --success:#00c27a; --error:#ff5f6d; --radius:24px; } *{ margin:0; padding:0; box-sizing:border-box; } body{ font-family:'DM Mono',monospace; min-height:100vh; overflow-x:hidden; background: radial-gradient(circle at top, rgba(0,229,255,.16), transparent 35%), radial-gradient(circle at bottom right, rgba(123,97,255,.18), transparent 35%), linear-gradient( 180deg, #050816 0%, #0b1120 100% ); color:var(--text); } body::before{ content:''; position:fixed; inset:0; background-image: linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px); background-size:40px 40px; pointer-events:none; } body::after{ content:''; position:fixed; width:900px; height:900px; top:-300px; right:-200px; background: radial-gradient(circle, rgba(0,229,255,.18), transparent 60%); filter:blur(120px); pointer-events:none; } .page{ max-width:980px; margin:auto; padding:80px 24px; } .brand{ text-align:center; margin-bottom:56px; } .brand h1{ font-family:'Instrument Serif',serif; font-size:6rem; line-height:1; letter-spacing:-0.05em; background:linear-gradient( 135deg, #fff, #dbeafe, #7dd3fc ); -webkit-background-clip:text; -webkit-text-fill-color:transparent; } .brand h1 em{ font-style:italic; background:linear-gradient( 135deg, #00e5ff, #7b61ff ); -webkit-background-clip:text; -webkit-text-fill-color:transparent; } .brand p{ margin-top:16px; color:var(--muted); font-size:.82rem; letter-spacing:.18em; text-transform:uppercase; } .hero-card{ background:var(--card); border:1px solid var(--border); backdrop-filter:blur(24px); border-radius:32px; padding:32px; box-shadow: 0 0 80px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.03); } textarea{ width:100%; min-height:90px; border:none; outline:none; resize:none; padding:24px; border-radius:24px; background:rgba(255,255,255,.04); color:white; font-size:1rem; font-family:'DM Mono',monospace; border:1px solid rgba(255,255,255,.08); transition:.3s; } textarea:focus{ border-color:var(--cyan); box-shadow: 0 0 0 4px rgba(0,229,255,.12), 0 0 40px rgba(0,229,255,.18); } textarea::placeholder{ color:#64748b; } .hint{ margin-top:10px; color:#64748b; font-size:.72rem; } .controls{ display:flex; gap:14px; margin-top:24px; } .pill-group{ display:flex; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:18px; overflow:hidden; } .pill{ border:none; background:transparent; color:#94a3b8; padding:14px 26px; cursor:pointer; transition:.25s; font-family:'DM Mono',monospace; } .pill.active{ background:linear-gradient( 135deg, #00e5ff, #7b61ff ); color:white; box-shadow: 0 0 30px rgba(0,229,255,.25); } .fetch-btn{ flex:1; border:none; border-radius:18px; background:linear-gradient( 135deg, #00e5ff, #7b61ff ); color:white; font-size:.9rem; font-family:'DM Mono',monospace; cursor:pointer; transition:.25s; box-shadow: 0 0 40px rgba(0,229,255,.25); } .fetch-btn:hover{ transform:translateY(-2px); box-shadow: 0 0 60px rgba(0,229,255,.35); } .cards{ margin-top:36px; } .card{ display:flex; gap:18px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); backdrop-filter:blur(24px); border-radius:24px; padding:18px; margin-bottom:18px; transition:.3s; animation:fadeUp .45s ease; } .card:hover{ transform:translateY(-4px); border-color:rgba(0,229,255,.3); box-shadow: 0 0 50px rgba(0,229,255,.08); } @keyframes fadeUp{ from{ opacity:0; transform:translateY(20px); } to{ opacity:1; transform:none; } } .card-thumb{ width:180px; height:100px; overflow:hidden; border-radius:18px; background:#111827; position:relative; } .card-thumb img{ width:100%; height:100%; object-fit:cover; } .card-title{ font-size:1.05rem; color:white; margin-bottom:8px; font-family:'Instrument Serif',serif; } .card-meta{ color:#94a3b8; font-size:.72rem; margin-bottom:16px; } .card-actions{ display:flex; gap:10px; flex-wrap:wrap; } .card-dl-btn{ border:none; padding:10px 18px; border-radius:14px; background:linear-gradient( 135deg, #00e5ff, #7b61ff ); color:white; cursor:pointer; font-family:'DM Mono',monospace; transition:.25s; } .card-dl-btn:hover{ transform:translateY(-2px); } .q-chip{ background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); color:#94a3b8; border-radius:12px; padding:8px 14px; cursor:pointer; } .q-chip.active{ border-color:#00e5ff; color:white; box-shadow: 0 0 20px rgba(0,229,255,.2); } .footer{ margin-top:70px; text-align:center; color:#64748b; font-size:.7rem; line-height:2; } @media(max-width:768px){ .brand h1{ font-size:4rem; } .hero-card{ padding:22px; } .controls{ flex-direction:column; } .card{ flex-direction:column; } .card-thumb{ width:100%; height:220px; } }
+    :root {
+      --bg: #f4f1eb;
+      --fg: #3a3a38;
+      --accent: #e85d2a;
+      --accent-hover: #d04e1f;
+      --muted: #9c9889;
+      --card: #fff;
+      --card-border: #e2ded6;
+      --success: #2d8a4e;
+      --error: #c43d3d;
+      --radius: 14px;
+      --shimmer: linear-gradient(90deg, #ebe8e2 25%, #f0ede7 50%, #ebe8e2 75%);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Mono', monospace;
+      background: var(--bg);
+      color: var(--fg);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      opacity: 0.03;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 128px;
+    }
+
+    .page {
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 60px 24px 80px;
+    }
+
+    .brand { margin-bottom: 48px; }
+    .brand h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: 4.2rem;
+      font-weight: 400;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: var(--fg);
+    }
+    .brand h1 em { font-style: italic; color: var(--accent); }
+    .brand p {
+      margin-top: 10px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 18px 20px;
+      border: 1.5px solid var(--card-border);
+      border-radius: var(--radius);
+      background: var(--card);
+      color: var(--fg);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.88rem;
+      outline: none;
+      resize: none;
+      min-height: 56px;
+      transition: border-color 0.25s, box-shadow 0.25s;
+      margin-bottom: 6px;
+    }
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(232, 93, 42, 0.08);
+    }
+    textarea::placeholder { color: var(--muted); }
+
+    .hint {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-bottom: 20px;
+      letter-spacing: 0.02em;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 6px;
+      align-items: center;
+    }
+    .pill-group {
+      display: flex;
+      border: 1.5px solid var(--card-border);
+      border-radius: 10px;
+      overflow: hidden;
+      background: var(--card);
+    }
+    .pill {
+      padding: 9px 18px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.76rem;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .pill.active { background: var(--fg); color: var(--bg); }
+    .pill:not(.active):hover { color: var(--fg); }
+
+    .fetch-btn {
+      flex: 1;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .fetch-btn:hover { background: var(--accent-hover); }
+    .fetch-btn:active { transform: scale(0.98); }
+    .fetch-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    /* Cards */
+    .cards { margin-top: 24px; }
+
+    .card {
+      display: flex;
+      gap: 14px;
+      border: 1.5px solid var(--card-border);
+      border-radius: var(--radius);
+      background: var(--card);
+      padding: 14px;
+      margin-bottom: 10px;
+      animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-thumb {
+      width: 120px;
+      min-width: 120px;
+      height: 80px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: var(--card-border);
+      flex-shrink: 0;
+      position: relative;
+    }
+    .card-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    /* No-thumbnail icon */
+    .card-thumb .no-thumb {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted);
+    }
+    .card-thumb .no-thumb svg {
+      width: 28px;
+      height: 28px;
+      opacity: 0.5;
+    }
+
+    /* Shimmer skeleton for loading state */
+    .card-thumb.loading {
+      background: var(--shimmer);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    .skeleton-line {
+      height: 12px;
+      border-radius: 4px;
+      background: var(--shimmer);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      margin-bottom: 6px;
+    }
+    .skeleton-line.short { width: 40%; height: 10px; }
+    .skeleton-line.medium { width: 75%; }
+    @keyframes shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    .card-body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .card-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: 1rem;
+      line-height: 1.3;
+      color: var(--fg);
+      margin-bottom: 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .card-meta {
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .card-dl-btn {
+      padding: 6px 14px;
+      border: none;
+      border-radius: 7px;
+      background: var(--fg);
+      color: var(--bg);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .card-dl-btn:hover { background: #2d2d2a; }
+    .card-dl-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .card-dl-btn.done { background: var(--success); color: #fff; }
+    .card-dl-btn.error { background: var(--error); color: #fff; }
+
+    .card-status {
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+    .card-status.downloading { color: var(--accent); }
+    .card-status.done { color: var(--success); }
+    .card-status.error { color: var(--error); }
+
+    .q-chip {
+      padding: 4px 10px;
+      border: 1.5px solid var(--card-border);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .q-chip.active {
+      border-color: var(--fg);
+      color: var(--fg);
+      background: rgba(26,26,24,0.04);
+    }
+    .q-chip:hover:not(.active) { border-color: var(--muted); }
+
+    /* Error card */
+    .card.card-error {
+      border-color: rgba(196, 61, 61, 0.2);
+      background: rgba(196, 61, 61, 0.03);
+    }
+    .card-error-icon {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(196, 61, 61, 0.08);
+      color: var(--error);
+    }
+    .card-error-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+    .card-error-msg {
+      font-size: 0.72rem;
+      color: var(--error);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+    .card-error-url {
+      font-size: 0.65rem;
+      color: var(--muted);
+      word-break: break-all;
+      margin-top: 4px;
+    }
+
+    /* Download all bar */
+    .dl-all-bar {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .dl-all-btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: var(--fg);
+      color: var(--bg);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .dl-all-btn:hover { background: #2d2d2a; }
+    .dl-all-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .spin {
+      display: inline-block;
+      width: 10px; height: 10px;
+      border: 2px solid currentColor;
+      border-right-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .footer {
+      margin-top: 48px;
+      text-align: center;
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      line-height: 1.8;
+    }
+
+    /* Mobile */
+    @media (max-width: 500px) {
+      .brand h1 { font-size: 3rem; }
+      .page { padding: 40px 16px 60px; }
+      .card { flex-direction: column; gap: 10px; }
+      .card-thumb {
+        width: 100%;
+        min-width: unset;
+        height: 160px;
+      }
+      .card-title { white-space: normal; }
+      .controls { flex-wrap: wrap; }
+      .fetch-btn { width: 100%; }
+    }
   </style>
 </head>
 <body>
   <div class="page">
     <div class="brand">
-      <h1>Be<em>Clip</em></h1>
+      <h1>Re<em>Clip</em></h1>
       <p>Free media downloader</p>
     </div>
 
-<div class="hero-card">
+    <textarea id="urls" placeholder="Paste one or more URLs..." rows="2"></textarea>
+    <p class="hint">Multiple links? Separate with spaces, commas, or newlines.</p>
 
-  <textarea
-    id="urls"
-    placeholder="Paste any video URL from YouTube, TikTok, X, Instagram..."
-    rows="2"></textarea>
-
-  <p class="hint">
-    AI-powered universal media extraction · 1000+ supported platforms
-  </p>
-
-  <div class="controls">
-
-    <div class="pill-group">
-      <button class="pill active"
-              data-format="video"
-              onclick="setFormat(this)">
-        MP4
-      </button>
-
-      <button class="pill"
-              data-format="audio"
-              onclick="setFormat(this)">
-        MP3
-      </button>
+    <div class="controls">
+      <div class="pill-group">
+        <button class="pill active" data-format="video" onclick="setFormat(this)">MP4</button>
+        <button class="pill" data-format="audio" onclick="setFormat(this)">MP3</button>
+      </div>
+      <button class="fetch-btn" id="goBtn" onclick="go()">Fetch</button>
     </div>
 
-    <button
-      class="fetch-btn"
-      id="goBtn"
-      onclick="go()">
-      Download Media
-    </button>
-
-  </div>
-
-</div>
-
-<div id="cards" class="cards"></div>
+    <div id="cards" class="cards"></div>
 
     <div class="footer">
       YouTube &middot; TikTok &middot; Instagram &middot; Twitter/X &middot; Reddit &middot; Facebook<br>
