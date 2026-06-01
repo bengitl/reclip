@@ -80,10 +80,29 @@ def index():
 
 @app.route("/api/info", methods=["POST"])
 def get_info():
-    data = request.json
-    url = data.get("url", "").strip()
-    if not url:
-        return jsonify({"error": "No URL provided"}), 400
+ data = request.get_json(silent=True) or {} 
+url = (
+      data.get("url") 
+      or request.form.get("url") 
+      or ""
+).strip()  
+if not url: 
+    return jsonify({ 
+        "success": False,  
+        "error": "No URL provided"  
+        }), 400 
+cookie_path = None 
+file = None  
+if 'cookieFile' in request.files: 
+    file = request.files['cookieFile'] 
+if file and file.filename:    
+  cookie_path = os.path.join( 
+      tempfile.gettempdir(), 
+      secure_filename(file.filename) 
+      )   
+  file.save(cookie_path)
+if not url:
+    return jsonify({"error": "No URL provided"}), 400
 
     cmd = ["yt-dlp", "--no-playlist", "-j", url]
     try:
